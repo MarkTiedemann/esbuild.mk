@@ -1,4 +1,4 @@
-ESBUILD_VERSION := 0.2.10
+ESBUILD_VERSION := 0.2.11
 ESBUILD_INSTALL := third_party
 include esbuild.mk
 

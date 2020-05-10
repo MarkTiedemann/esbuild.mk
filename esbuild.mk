@@ -13,8 +13,21 @@ ifeq ($(OS),Windows_NT)
 # begin-windows
 
 SHELL := cmd.exe
+ESBUILD_TGZ := $(ESBUILD_PATH)\esbuild-$(ESBUILD_VERSION).tgz
+esbuild := $(ESBUILD_INSTALL)\esbuild-$(ESBUILD_VERSION).exe
 
-# TODO(Mark): Add Windows build
+$(ESBUILD_INSTALL):
+	md $(ESBUILD_INSTALL)
+
+# Since 2018, `curl` and `tar` are available on Windows
+# https://devblogs.microsoft.com/commandline/tar-and-curl-come-to-windows/
+
+$(esbuild): | $(ESBUILD_INSTALL)
+	curl -o $(ESBUILD_TGZ) https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-$(ESBUILD_VERSION).tgz
+	tar zxf $(ESBUILD_TGZ) -C $(ESBUILD_INSTALL)
+	move $(ESBUILD_INSTALL)\package\esbuild.exe $(esbuild)
+	del $(ESBUILD_TGZ)
+	rd /s /q $(ESBUILD_INSTALL)\package
 
 # end-windows
 else
@@ -27,7 +40,7 @@ $(ESBUILD_INSTALL):
 	mkdir -p $(ESBUILD_INSTALL)
 
 $(esbuild): | $(ESBUILD_INSTALL)
-	curl -o $(esbuild).tgz -C - https://registry.npmjs.org/esbuild-$(ESBUILD_TARGET)-64/-/esbuild-$(ESBUILD_TARGET)-64-$(ESBUILD_VERSION).tgz
+	curl -o $(esbuild).tgz https://registry.npmjs.org/esbuild-$(ESBUILD_TARGET)-64/-/esbuild-$(ESBUILD_TARGET)-64-$(ESBUILD_VERSION).tgz
 	tar zxf $(esbuild).tgz -C $(ESBUILD_INSTALL)
 	mv $(ESBUILD_INSTALL)/package/bin/esbuild $(esbuild)
 	rm -rf $(esbuild).tgz $(ESBUILD_INSTALL)/package
